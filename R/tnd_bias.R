@@ -146,7 +146,8 @@ estimate_bias_parallel <- function(iters,
                                    risk_voi.dx.given.no.vx = 0.029,
                                    weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)
 ) {
-  sims <- mcmapply(
+  sims <- mapply(
+  # sims <- mcmapply(
     function(x) one_iter(
       sampleN,
       rr_voi.given.cv.status = rr_voi.given.cv.status,
@@ -160,7 +161,7 @@ estimate_bias_parallel <- function(iters,
       fixed = FALSE
     )$calculated_VE,
     1:iters,
-    mc.set.seed = TRUE
+    # mc.set.seed = TRUE
   )
   rownames(sims) <- weight
   sims
@@ -187,9 +188,9 @@ ci_from_sims <- function(sims) {
 }
 
 #' num_ci
-#' 
+#'
 #' Helper function to compute quantiles.
-#' 
+#'
 #' @param sims sims
 num_ci <- function(sims) {
   data.frame(t(apply(sims, 1, quantile, c(0.5, 0.025, 0.975))),
@@ -201,11 +202,11 @@ num_ci <- function(sims) {
 #' @inheritParams estimate_bias_parallel
 #'
 #' @export
-#' 
+#'
 #' @importFrom dplyr bind_rows mutate rename
-#' @import magrittr 
+#' @import magrittr
 #' @importFrom tibble rownames_to_column
-#' 
+#'
 get_plot_data <- function(ve_voi,
                       iters = 1e3,
                       sampleN = 200000,
@@ -217,7 +218,7 @@ get_plot_data <- function(ve_voi,
                       risk_voi.dx.given.no.vx = 0.05,
                       weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)
 ) {
-  res <- 
+  res <-
     lapply(
       ve_voi,
       estimate_bias_parallel,
@@ -229,14 +230,14 @@ get_plot_data <- function(ve_voi,
       ve_cv = ve_cv,
       risk_cv.dx.given.no.vx = risk_cv.dx.given.no.vx,
       risk_voi.dx.given.no.vx = risk_voi.dx.given.no.vx,
-      weight = weight    
+      weight = weight
     )
-  
-  lapply(res, num_ci) %>% 
-    lapply(rownames_to_column, "weight") %>% 
-    setNames(ve_voi) %>% 
-    bind_rows(.id = "ve_voi") %>% 
-    mutate(ve_voi = as.numeric(ve_voi)) %>% 
+
+  lapply(res, num_ci) %>%
+    lapply(rownames_to_column, "weight") %>%
+    setNames(ve_voi) %>%
+    bind_rows(.id = "ve_voi") %>%
+    mutate(ve_voi = as.numeric(ve_voi)) %>%
     rename(bias = `50%`)
 }
 
