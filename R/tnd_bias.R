@@ -160,7 +160,7 @@ estimate_bias_parallel <- function(iters,
       weight = weight,
       fixed = FALSE
     )$calculated_VE,
-    1:iters,
+    1:iters
     # mc.set.seed = TRUE
   )
   rownames(sims) <- weight
