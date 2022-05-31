@@ -2,5 +2,11 @@
 
 export(ci_from_sims)
 export(estimate_bias_parallel)
+export(get_plot_data)
 export(one_iter)
+import(magrittr)
+importFrom(dplyr,bind_rows)
+importFrom(dplyr,mutate)
+importFrom(dplyr,rename)
 importFrom(parallel,mcmapply)
+importFrom(tibble,rownames_to_column)

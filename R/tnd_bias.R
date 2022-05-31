@@ -26,10 +26,11 @@ one_iter <- function(sampleN,
 
   if(!fixed){
     two.by.two <-
-      table(factor(
-        sample(1:4, size = sampleN,
-               prob = prob,
-               replace = TRUE), levels = 1:4))
+      # table(factor(
+      #   sample(1:4, size = sampleN,
+      #          prob = prob,
+      #          replace = TRUE), levels = 1:4))
+    c(rmultinom(n = 1, size = sampleN, prob = prob))
   } else {
     two.by.two <- prob * sampleN
   }
@@ -185,6 +186,59 @@ ci_from_sims <- function(sims) {
   sim_quantiles["bias_ci"]
 }
 
+#' num_ci
+#' 
+#' Helper function to compute quantiles.
+#' 
+#' @param sims sims
+num_ci <- function(sims) {
+  data.frame(t(apply(sims, 1, quantile, c(0.5, 0.025, 0.975))),
+             check.names = FALSE)
+}
+
+#' Get plot data
+#'
+#' @inheritParams estimate_bias_parallel
+#'
+#' @export
+#' 
+#' @importFrom dplyr bind_rows mutate rename
+#' @import magrittr 
+#' @importFrom tibble rownames_to_column
+#' 
+get_plot_data <- function(ve_voi,
+                      iters = 1e3,
+                      sampleN = 200000,
+                      rr_voi.given.cv.status = 8.0,
+                      coverage_voi = 0.55,
+                      coverage_cv = 0.7,
+                      ve_cv = 0.9,
+                      risk_cv.dx.given.no.vx = 0.05,
+                      risk_voi.dx.given.no.vx = 0.05,
+                      weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)
+) {
+  res <- 
+    lapply(
+      ve_voi,
+      estimate_bias_parallel,
+      iters = iters,
+      sampleN = sampleN,
+      rr_voi.given.cv.status = rr_voi.given.cv.status,
+      coverage_voi = coverage_voi,
+      coverage_cv = coverage_cv,
+      ve_cv = ve_cv,
+      risk_cv.dx.given.no.vx = risk_cv.dx.given.no.vx,
+      risk_voi.dx.given.no.vx = risk_voi.dx.given.no.vx,
+      weight = weight    
+    )
+  
+  lapply(res, num_ci) %>% 
+    lapply(rownames_to_column, "weight") %>% 
+    setNames(ve_voi) %>% 
+    bind_rows(.id = "ve_voi") %>% 
+    mutate(ve_voi = as.numeric(ve_voi)) %>% 
+    rename(bias = `50%`)
+}
 
 
 ######## Example simulation ###################
