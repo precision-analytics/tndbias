@@ -5,6 +5,8 @@
 #' @export
 one_iter <- function(sampleN,
                      rr_voi.given.cv.status = 8.0,
+                     rr_voi.given.cv.status.min = NA,
+                     rr_voi.given.cv.status.max = NA,
                      coverage_voi = 0.7,
                      coverage_cv = 0.55,
                      ve_cv = 0.4,
@@ -14,9 +16,16 @@ one_iter <- function(sampleN,
                      weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
                      fixed = FALSE) {
 
+  # If a range of RR is given, then sample
+  if(!is.na(rr_voi.given.cv.status.min) &
+     !is.na(rr_voi.given.cv.status.max) &
+     rr_voi.given.cv.status.min <= rr_voi.given.cv.status.max) {
+    rr_voi.given.cv.status <-
+      runif(1, rr_voi.given.cv.status.min, rr_voi.given.cv.status.max)
+  }
+
   # If the 2x2 coverage table is fixed, use it to determine the probability of
   # VOI vaccination.
-
   a <-
     (coverage_voi * coverage_cv * rr_voi.given.cv.status) /
     (1 - coverage_cv + (rr_voi.given.cv.status * coverage_cv))
@@ -138,6 +147,8 @@ one_iter <- function(sampleN,
 estimate_bias_parallel <- function(iters,
                                    sampleN,
                                    rr_voi.given.cv.status = 1.5,
+                                   rr_voi.given.cv.status.min = NA,
+                                   rr_voi.given.cv.status.max = NA,
                                    coverage_voi = 0.7,
                                    coverage_cv = 0.55,
                                    ve_cv = 0.4,
@@ -151,6 +162,8 @@ estimate_bias_parallel <- function(iters,
     function(x) one_iter(
       sampleN,
       rr_voi.given.cv.status = rr_voi.given.cv.status,
+      rr_voi.given.cv.status.min = rr_voi.given.cv.status.min,
+      rr_voi.given.cv.status.max = rr_voi.given.cv.status.max,
       coverage_voi = coverage_voi,
       coverage_cv = coverage_cv,
       ve_cv = ve_cv,
@@ -211,6 +224,8 @@ get_plot_data <- function(ve_voi,
                       iters = 1e3,
                       sampleN = 200000,
                       rr_voi.given.cv.status = 8.0,
+                      rr_voi.given.cv.status.min = NA,
+                      rr_voi.given.cv.status.max = NA,
                       coverage_voi = 0.55,
                       coverage_cv = 0.7,
                       ve_cv = 0.9,
@@ -225,6 +240,8 @@ get_plot_data <- function(ve_voi,
       iters = iters,
       sampleN = sampleN,
       rr_voi.given.cv.status = rr_voi.given.cv.status,
+      rr_voi.given.cv.status.min = rr_voi.given.cv.status.min,
+      rr_voi.given.cv.status.max = rr_voi.given.cv.status.max,
       coverage_voi = coverage_voi,
       coverage_cv = coverage_cv,
       ve_cv = ve_cv,
