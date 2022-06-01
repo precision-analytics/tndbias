@@ -237,6 +237,7 @@ get_plot_data <- function(ve_voi,
     lapply(rownames_to_column, "weight") %>%
     setNames(ve_voi) %>%
     bind_rows(.id = "ve_voi") %>%
+    mutate(weight = as.numeric(weight)) %>%
     mutate(ve_voi = as.numeric(ve_voi)) %>%
     rename(bias = `50%`)
 }
