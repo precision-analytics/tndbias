@@ -1,3 +1,29 @@
+#' Get constraints on rr
+#' @importFrom assertthat assert_that
+rr_constraints <- function(coverage_voi, coverage_cv) {
+  assert_that(coverage_voi <= 1, coverage_voi >=0,
+              coverage_cv  <= 1, coverage_cv  >=0)
+  a <- coverage_voi
+  b <- coverage_cv
+  if(0 < a & a <= 0.5) {
+    if(b<a) {
+      return(c(0,((b-1)/(b-a))))
+    }
+  } else if (0.5 < a & a < 1) {
+    if(b<=(1-a)) {
+      return(c(0,(b-1)/(b-a)))
+    } else if ((1-a) < b & b < a) {
+      return(c((a+b-1)/b,(b-1)/(b-a)))
+    }
+  }
+  c(0,Inf)
+}
+
+#' x is inside interval
+inside <- function(x,int) {
+  x > int[1] & x < int[2]
+}
+
 #' One iteration of the simulation.
 #'
 #' @inheritParams estimate_bias_parallel
@@ -16,12 +42,20 @@ one_iter <- function(sampleN,
                      weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1),
                      fixed = FALSE) {
 
+  assert_that(coverage_voi <= 1, coverage_voi >=0,
+              coverage_cv  <= 1, coverage_cv  >=0)
+  constraints <- rr_constraints(coverage_voi, coverage_cv)
+  
   # If a range of RR is given, then sample
   if(!is.na(rr_voi.given.cv.status.min) &
      !is.na(rr_voi.given.cv.status.max) &
      rr_voi.given.cv.status.min <= rr_voi.given.cv.status.max) {
+    assert_that(inside(rr_voi.given.cv.status.min, constraints),
+                inside(rr_voi.given.cv.status.max, constraints))
     rr_voi.given.cv.status <-
       runif(1, rr_voi.given.cv.status.min, rr_voi.given.cv.status.max)
+  } else {
+    assert_that(inside(rr_voi.given.cv.status, constraints))
   }
 
   # If the 2x2 coverage table is fixed, use it to determine the probability of

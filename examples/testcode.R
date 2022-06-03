@@ -4,18 +4,20 @@ library(scales)
 set.seed(1)
 
 ve_voi <- seq(0,1,0.1)
+
 ci_res <-
   get_plot_data(ve_voi = ve_voi,
             iters = 1e3,
             sampleN = 200000,
-            rr_voi.given.cv.status = 8.0,
-            coverage_voi = 0.55,
+            rr_voi.given.cv.status = 1.5,
+            coverage_voi = 0.9,
             coverage_cv = 0.7,
             ve_cv = 0.9,
             risk_cv.dx.given.no.vx = 0.05,
             risk_voi.dx.given.no.vx = 0.05,
             weight = c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)
   )
+rr_constraints(.9, 0.7)
 
 ci_res2 <-
   get_plot_data(ve_voi = ve_voi,

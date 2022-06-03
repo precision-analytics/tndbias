@@ -8,6 +8,8 @@ estimate_bias_parallel(
   iters,
   sampleN,
   rr_voi.given.cv.status = 1.5,
+  rr_voi.given.cv.status.min = NA,
+  rr_voi.given.cv.status.max = NA,
   coverage_voi = 0.7,
   coverage_cv = 0.55,
   ve_cv = 0.4,

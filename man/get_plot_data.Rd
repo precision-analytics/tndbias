@@ -9,6 +9,8 @@ get_plot_data(
   iters = 1000,
   sampleN = 2e+05,
   rr_voi.given.cv.status = 8,
+  rr_voi.given.cv.status.min = NA,
+  rr_voi.given.cv.status.max = NA,
   coverage_voi = 0.55,
   coverage_cv = 0.7,
   ve_cv = 0.9,

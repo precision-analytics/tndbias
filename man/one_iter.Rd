@@ -7,6 +7,8 @@
 one_iter(
   sampleN,
   rr_voi.given.cv.status = 8,
+  rr_voi.given.cv.status.min = NA,
+  rr_voi.given.cv.status.max = NA,
   coverage_voi = 0.7,
   coverage_cv = 0.55,
   ve_cv = 0.4,
